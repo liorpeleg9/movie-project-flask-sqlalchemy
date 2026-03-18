@@ -1,9 +1,13 @@
+"""Database models for the MoviWeb Flask application."""
+
 from flask_sqlalchemy import SQLAlchemy
 
 db = SQLAlchemy()
 
 
 class User(db.Model):
+    """Represents a user who owns a collection of movies."""
+
     __tablename__ = "user"
 
     id = db.Column(db.Integer, primary_key=True)
@@ -18,6 +22,8 @@ class User(db.Model):
 
 
 class Movie(db.Model):
+    """Represents a movie that belongs to a specific user."""
+
     __tablename__ = "movie"
 
     id = db.Column(db.Integer, primary_key=True)

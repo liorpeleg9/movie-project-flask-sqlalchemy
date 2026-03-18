@@ -1,3 +1,5 @@
+"""Flask application for managing users and their movie collections."""
+
 import os
 import requests
 
@@ -16,6 +18,7 @@ data_manager = DataManager()
 
 
 def fetch_movie_data(title):
+    """Fetch movie details from the OMDb API or return fallback data."""
     api_key = os.getenv("OMDB_API_KEY")
 
     if not api_key:
@@ -60,12 +63,14 @@ def fetch_movie_data(title):
 
 @app.route("/")
 def home():
+    """Render the home page with the list of users."""
     users = data_manager.get_users()
     return render_template("index.html", users=users)
 
 
 @app.route("/users", methods=["POST"])
 def create_user():
+    """Create a new user from form input and redirect to the home page."""
     name = request.form.get("name", "").strip()
     if name:
         data_manager.create_user(name)
@@ -74,6 +79,7 @@ def create_user():
 
 @app.route("/users/<int:user_id>/movies", methods=["GET"])
 def user_movies(user_id):
+    """Display all movies that belong to a specific user."""
     user = db.session.get(User, user_id)
     if not user:
         abort(404)
@@ -84,6 +90,7 @@ def user_movies(user_id):
 
 @app.route("/users/<int:user_id>/movies", methods=["POST"])
 def add_movie(user_id):
+    """Add a movie for a specific user using form input and OMDb data."""
     user = db.session.get(User, user_id)
     if not user:
         abort(404)
@@ -106,6 +113,7 @@ def add_movie(user_id):
 
 @app.route("/users/<int:user_id>/movies/<int:movie_id>/update", methods=["POST"])
 def update_movie(user_id, movie_id):
+    """Update the title of a selected movie for a specific user."""
     user = db.session.get(User, user_id)
     movie = db.session.get(Movie, movie_id)
 
@@ -121,6 +129,7 @@ def update_movie(user_id, movie_id):
 
 @app.route("/users/<int:user_id>/movies/<int:movie_id>/delete", methods=["POST"])
 def delete_movie(user_id, movie_id):
+    """Delete a selected movie for a specific user."""
     user = db.session.get(User, user_id)
     movie = db.session.get(Movie, movie_id)
 
@@ -133,10 +142,12 @@ def delete_movie(user_id, movie_id):
 
 @app.errorhandler(404)
 def page_not_found(e):
+    """Render a custom 404 error page."""
     return render_template("404.html"), 404
-    
+
 
 if __name__ == "__main__":
+    """Create database tables and run the Flask development server."""
     with app.app_context():
         db.create_all()
     app.run(host="0.0.0.0", port=5000, debug=True)
